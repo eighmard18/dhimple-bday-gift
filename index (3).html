@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#4a2338;--berry:#d6336c;--card:rgba(255,255,255,.8);--dot:rgba(74,35,56,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#ffe3ee;--card:rgba(40,16,32,.78);--dot:rgba(255,227,238,.3);--berry:#ff7aa8}}
+:root[data-theme="dark"]{--ink:#ffe3ee;--card:rgba(40,16,32,.78);--dot:rgba(255,227,238,.3);--berry:#ff7aa8}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#ffd9e6,#fff1e6);cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(160deg,#3a1428,#2a1630)}}
+:root[data-theme="dark"] body{background:linear-gradient(160deg,#3a1428,#2a1630)}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+#ui{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));pointer-events:none}
+#ui>*{pointer-events:auto}
+#card{background:var(--card);backdrop-filter:blur(8px);border-radius:28px;padding:16px 22px;text-align:center;width:100%;max-width:520px;box-shadow:0 8px 0 rgba(214,51,108,.18);animation:cardin .5s both}
+#card h1{margin:0 0 4px;font-size:clamp(1.5rem,6vw,2rem);font-weight:600;color:var(--berry)}
+#card p{margin:0;font-size:1.05rem;line-height:1.45}
+@keyframes cardin{from{opacity:0;transform:translateY(14px) scale(.96)}}
+nav{display:flex;align-items:center;gap:14px}
+button{font:inherit;font-weight:500;border:0;border-radius:999px;padding:12px 26px;background:var(--berry);color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+button.ghost{background:var(--card);color:var(--ink);box-shadow:none;padding:10px 16px}
+button[hidden]{display:none}
+#dots{display:flex;gap:8px}
+#dots i{width:10px;height:10px;border-radius:50%;background:var(--dot);transition:all .3s}
+#dots i.on{background:var(--berry);transform:scale(1.5)}
+.burst{position:fixed;pointer-events:none;font-size:26px;animation:burst .9s ease-out forwards;z-index:5}
+@keyframes burst{to{transform:translate(var(--x),var(--y)) scale(.4);opacity:0}}
+</style>
+</head>
+<body>
+<div id="ui">
+  <div id="card"><h1 id="t"></h1><p id="p"></p></div>
+  <nav>
+    <button class="ghost" id="back" aria-label="Go back">Back</button>
+    <div id="dots" aria-hidden="true"></div>
+    <button id="next">Next</button>
+  </nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.THREE||document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>')</script>
+<script>
+const T=window.THREE||new Proxy({},{get:()=>class{}}),$=id=>document.getElementById(id),dark=matchMedia('(prefers-color-scheme: dark)').matches;
+let R;try{if(!window.THREE)throw 0;R=new T.WebGLRenderer({antialias:true})}catch(e){}
+const M=(c,o={})=>new T.MeshLambertMaterial({color:c,...o}),B=c=>new T.MeshBasicMaterial({color:c});
+const sk=M(0xffd7b8),hrm=M(0x5a3a2e),dk=B(0x3a2030),pkm=M(0xff8fb1);
+const sp=(g,m,r,x,y,z,sx=1,sy=1,sz=1)=>{const o=new T.Mesh(new T.SphereGeometry(r,18,12),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);g.add(o);return o};
+const sc=(m,f)=>m.scale.setScalar(m.userData.s*f);
+const eb=p=>{const x=p-1;return 1+2.7*x**3+1.7*x*x};
+let HG;
+function heart(c,s=1){if(!HG){const hp=[];for(let k=0;k<48;k++){const t=k/48*6.2832;hp.push(new T.Vector2(16*Math.sin(t)**3,13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)))}
+ HG=new T.ExtrudeGeometry(new T.Shape(hp),{depth:6,bevelEnabled:true,bevelSize:1.5,bevelThickness:1.5,bevelSegments:2,curveSegments:1});HG.center();HG.scale(.06,.06,.06)}
+ const m=new T.Mesh(HG,M(c,{emissive:c,emissiveIntensity:.25}));m.userData.s=s;m.scale.setScalar(s);return m}
+function mkHead(her){const h=new T.Group(),e=new T.Group();sp(h,sk,.55,0,0,0);
+ const hair=new T.Mesh(new T.SphereGeometry(.59,18,10,0,6.2832,0,1.75),hrm);hair.rotation.x=-.35;hair.position.y=.04;h.add(hair);
+ if(her){sp(h,hrm,.2,-.5,-.2,-.05,1,2.2,1.2);sp(h,hrm,.2,.5,-.2,-.05,1,2.2,1.2);sp(h,pkm,.12,-.15,.58,.1);sp(h,pkm,.12,.15,.58,.1)}
+ sp(e,dk,.07,-.2,.05,.5);sp(e,dk,.07,.2,.05,.5);h.add(e);
+ sp(h,pkm,.09,-.34,-.12,.42,1,.8,.4);sp(h,pkm,.09,.34,-.12,.42,1,.8,.4);
+ const mo=new T.Mesh(new T.TorusGeometry(.09,.016,6,12,3.1416),dk);mo.rotation.z=3.1416;mo.position.set(0,-.1,.54);h.add(mo);
+ h.userData.eyes=e;return h}
+function person(her,col){const g=new T.Group(),b=new T.Group();g.add(b);
+ sp(b,M(col||(her?0xff8fb1:0x7aa7ff)),.55,0,.8,0,1,1.2,1);
+ const hd=mkHead(her);hd.position.y=1.95;b.add(hd);
+ const arm=s=>{const p=new T.Group();p.position.set(s*.58,1.3,0);const c=new T.Mesh(new T.CylinderGeometry(.1,.1,.55,8),sk);c.position.y=-.27;p.add(c);b.add(p);return p};
+ const aL=arm(-1),aR=arm(1);sp(b,hrm,.17,-.22,.06,.12,1,.6,1.4);sp(b,hrm,.17,.22,.06,.12,1,.6,1.4);
+ g.userData={b,aL,aR,eyes:hd.userData.eyes};return g}
+function idle(p,t,w=0,hop=0){const u=p.userData;u.b.position.y=hop?Math.abs(Math.sin(t*9))*.3:Math.sin(t*3)*.05;u.eyes.scale.y=(t%4)>3.85?.1:1;
+ u.aR.rotation.z=w&1?2.4+Math.sin(t*9)*.4:.15;u.aL.rotation.z=w&2?-2.4-Math.sin(t*9)*.4:-.15}
+const island=(g,c)=>{const m=new T.Mesh(new T.CylinderGeometry(7,7.6,.9,48),M(c));m.position.y=-.45;g.add(m);const r=new T.Mesh(new T.TorusGeometry(7.1,.12,6,48),M(0xffffff));r.rotation.x=1.5708;g.add(r)};
+const cloud=(x,y,z,s=1)=>{const c=new T.Group(),m=B(0xffffff);[[0,0,1],[-.9,-.15,.7],[.9,-.1,.75],[.3,.4,.65]].forEach(([a,b,r])=>sp(c,m,r,a,b,0));c.position.set(x,y,z);c.scale.setScalar(s);return c};
+const spark=(g,x,y,z,s=1)=>{const m=new T.Mesh(new T.OctahedronGeometry(.18*s),B(0xffd54a));m.position.set(x,y,z);g.add(m);return m};
+const twk=(m,t,k)=>{m.rotation.y=t*2;m.scale.setScalar(.6+.5*Math.sin(t*3+k))};
+const hearts=(g,n,c=0xff5c8a,s=.45)=>[...Array(n)].map(()=>{const h=heart(c,s);g.add(h);return h});
+
+/* ===== EDIT YOUR STORY HERE: title, text, sky color, camera [x,y,z,lookY]; build() makes the 3D scene ===== */
+const OLD=[
+{title:"Once upon a time…",text:"There were two people who had no idea they were about to change each other’s lives.",sky:"#ffd9e6",cam:[0,3.6,11,.9],
+ build(g,u){island(g,0xffc2d6);const a=person(),b=person(1);a.position.set(-3,0,0);a.rotation.y=.7;b.position.set(3,0,0);b.rotation.y=-.7;g.add(a,b);
+  const ds=[...Array(14)].map(()=>{const d=new T.Mesh(new T.SphereGeometry(.1,8,6),M(0xff5c8a));g.add(d);return d}),hh=heart(0xff5c8a,.9);hh.position.y=4.8;g.add(hh);
+  const cs=[cloud(-6,6,-3),cloud(5,7,-4,.8)];g.add(...cs);const ss=[spark(g,-1,5.5,0),spark(g,2,6,0,.8)];
+  u.push(t=>{idle(a,t,1);idle(b,t+1,2);ds.forEach((d,k)=>{const f=(t*.3+k/14)%1;d.position.set(-3+6*f,2.4+Math.sin(f*3.1416)*1.8,0);d.scale.setScalar(Math.sin(f*3.1416)+.05)});sc(hh,1+Math.sin(t*5)*.12);hh.rotation.y=Math.sin(t)*.4;cs.forEach((c,k)=>c.position.x=(k?5:-6)+Math.sin(t*.4+k)*1.5);ss.forEach((s,k)=>twk(s,t,k))})}},
+{title:"Then we met",text:"Write the day you met here: where you were, who said hi first, what you remember most.",sky:"#ffe0cc",cam:[-3,3.4,10.5,1],
+ build(g,u){island(g,0xffd0b0);const a=person(),b=person(1);a.rotation.y=.5;b.rotation.y=-.5;g.add(a,b);const hh=heart(0xff5c8a,1.5);hh.position.y=4.3;g.add(hh);
+  const bs=hearts(g,8,0xff8fb1,.4),cs=[cloud(-6,6,-3),cloud(6,5.5,-4,.9)];g.add(...cs);
+  u.push(t=>{const f=Math.min(t/2.4,1),e=1-(1-f)**3;a.position.x=-8+6.8*e;b.position.x=8-6.8*e;idle(a,t,f<1?0:1,f<1);idle(b,t,f<1?0:2,f<1);
+   const p=Math.max(0,Math.min((t-2.5)/.6,1));sc(hh,p?eb(p):0);
+   bs.forEach((h,k)=>{if(t<2.5){sc(h,0);return}const an=k*.785,tt=(t-2.5)%2.4;h.position.set(Math.cos(an)*tt*2.3,4.3+Math.sin(an)*tt*1.4,0);sc(h,1-tt/2.4)});
+   cs.forEach((c,k)=>c.position.x=(k?6:-6)+Math.sin(t*.4+k)*1.5)})}},
+{title:"Our first date",text:"Tell her about the little details: what you ordered, what you talked about, how nervous you were.",sky:"#fff0c9",cam:[0,4.6,10,1],
+ build(g,u){island(g,0xffe2b8);const a=person(),b=person(1);a.position.x=-3.6;b.position.x=3.6;a.rotation.y=1.2;b.rotation.y=-1.2;g.add(a,b);
+  const tb=new T.Mesh(new T.CylinderGeometry(1.7,1.7,.14,32),M(0xc98f6b));tb.position.y=1.5;const lg=new T.Mesh(new T.CylinderGeometry(.18,.3,1.5,12),M(0xb07a5a));lg.position.y=.75;g.add(tb,lg);
+  [-.75,.75].forEach(x=>{const c=new T.Mesh(new T.CylinderGeometry(.3,.22,.42,16),M(0xffffff));c.position.set(x,1.78,0);g.add(c)});
+  const sm=[...Array(6)].map(()=>sp(g,B(0xffffff),.13,0,0,0)),bl=[...Array(11)].map((_,k)=>sp(g,B(k%2?0xffd54a:0xff8fb1),.17,-6+k*1.2,5.2-1.1*Math.sin(k/10*3.1416),0)),hs=hearts(g,3);
+  u.push(t=>{idle(a,t);idle(b,t+1);sm.forEach((s,k)=>{const f=(t*.5+k/6)%1,x=k%2?.75:-.75;s.position.set(x+Math.sin(f*9+k)*.1,2.1+f*1.4,0);s.scale.setScalar(1-f)});bl.forEach((o,k)=>o.scale.setScalar(1+.35*Math.sin(t*3+k)));hs.forEach((h,k)=>{const f=(t*.3+k/3)%1;h.position.set(Math.sin(f*6+k)*.4,2.6+f*3,0);sc(h,1-f*.5)})})}},
+{title:"Adventures together",text:"Trips, road rides, silly nights in. Add the moments that make you both laugh when you remember them.",sky:"#cfeedd",cam:[5,3.2,10,.8],
+ build(g,u){const gr=new T.Mesh(new T.BoxGeometry(60,.6,18),M(0xbfe8d2));gr.position.y=-.3;g.add(gr);const rd=new T.Mesh(new T.BoxGeometry(60,.1,3.4),M(0x7d6b7d));rd.position.y=.03;g.add(rd);
+  const ds=[...Array(8)].map(()=>{const d=new T.Mesh(new T.BoxGeometry(1.2,.04,.18),B(0xffffff));d.position.y=.1;g.add(d);return d});
+  const tr=[...Array(10)].map((_,k)=>{const o=new T.Group(),c=new T.Mesh(new T.ConeGeometry(.9,2.2,10),M(k%3?0x7ccf9a:0xffa8c4));c.position.y=2;const tk=new T.Mesh(new T.CylinderGeometry(.14,.14,.9,6),M(0xa0624a));tk.position.y=.45;o.add(c,tk);o.position.z=(k%2?1:-1)*(3.6+(k%3)*1.2);g.add(o);return o});
+  const car=new T.Group();g.add(car);const body=new T.Mesh(new T.BoxGeometry(3.2,.75,1.5),M(0xff7aa8));body.position.y=.78;const cab=new T.Mesh(new T.BoxGeometry(1.6,.7,1.35),M(0xdff3ff,{transparent:true,opacity:.55}));cab.position.set(-.2,1.5,0);car.add(body,cab);
+  [mkHead(0),mkHead(1)].forEach((h,k)=>{h.scale.setScalar(.5);h.position.set(-.65+k*.7,1.65,0);car.add(h)});
+  const ws=[[-1,.75],[-1,-.75],[1,.75],[1,-.75]].map(([x,z])=>{const w=new T.Group();w.position.set(x,.4,z);const c=new T.Mesh(new T.CylinderGeometry(.4,.4,.26,16),M(0x4a2f45));c.rotation.x=1.5708;w.add(c);const s1=new T.Mesh(new T.BoxGeometry(.55,.07,.3),M(0xffd9e6)),s2=s1.clone();s2.rotation.z=1.5708;w.add(s1,s2);car.add(w);return w});
+  const sun=new T.Mesh(new T.SphereGeometry(2,20,14),B(0xffd95a));sun.position.set(12,9,-9);g.add(sun);const cs=[cloud(-8,7,-5),cloud(4,8,-6,1.2)];g.add(...cs);const hs=hearts(g,2);
+  u.push((t,dt)=>{car.position.y=Math.abs(Math.sin(t*8))*.05;ws.forEach(w=>w.rotation.z-=dt*9);ds.forEach((d,k)=>d.position.x=(((k*3.6-t*8)%28.8)+28.8)%28.8-14.4);tr.forEach((o,k)=>o.position.x=(((k*5-t*4)%50)+50)%50-25);cs.forEach((c,k)=>c.position.x=(k?4:-8)+Math.sin(t*.4+k)*2);hs.forEach((h,k)=>{const f=(t*.4+k/2)%1;h.position.set(-2.3-f*1.5,1.5+f*2.2,0);sc(h,1-f)})})}},
+{title:"The big question",text:"Describe the moment you asked her, and the moment she said yes.",sky:"#ffe3f0",cam:[0,3.4,10.5,1.6],
+ build(g,u){island(g,0xffc0d9);const a=person(),b=person(1);a.position.x=-3.4;b.position.x=3.4;a.rotation.y=.8;b.rotation.y=-.8;g.add(a,b);
+  const rg=new T.Group();g.add(rg);const ring=new T.Mesh(new T.TorusGeometry(.7,.13,12,36),M(0xffc83d,{emissive:0xffa000,emissiveIntensity:.4})),dm=new T.Mesh(new T.OctahedronGeometry(.3),M(0x9be7ff,{emissive:0x4fc3f7,emissiveIntensity:.6}));dm.position.y=.95;rg.add(ring,dm);
+  const ss=[...Array(8)].map(()=>spark(g,0,0,0)),dirs=[...Array(16)].map((_,k)=>{const y=1-2*(k+.5)/16,r=Math.sqrt(1-y*y),an=k*2.4;return new T.Vector3(Math.cos(an)*r,y,Math.sin(an)*r)});
+  const fw=[[-6,7.5,-3,0xff5c8a],[6,7,-3,0xffc83d],[0,9,-5,0x7aa7ff]].map(([x,y,z,c],k)=>({x,y,z,k,ps:dirs.map(()=>sp(g,B(c),.14,0,0,0))}));
+  u.push(t=>{idle(a,t,3);idle(b,t+1,3);rg.scale.setScalar(Math.min(t,1));rg.rotation.y=t*1.5;rg.position.y=3+Math.sin(t*2)*.15;ss.forEach((s,k)=>{const an=t*.8+k*.785;s.position.set(Math.cos(an)*1.7,3+Math.sin(an*1.3)*.8,Math.sin(an)*1.7);twk(s,t,k)});
+   fw.forEach(f=>{const tt=(t*.7+f.k*.9)%2.4,r=tt*2.6;f.ps.forEach((s,k)=>{s.position.set(f.x+dirs[k].x*r,f.y+dirs[k].y*r-tt*tt*.4,f.z+dirs[k].z*r);s.scale.setScalar(Math.max(0,1-tt/2.4))})})})}},
+{title:"And now, forever",text:"Thank you for being my home. I love you more every single day.",sky:"#ffc9dc",cam:[0,3.8,12,1.8],
+ build(g,u){island(g,0xf7a8c4);const sun=new T.Mesh(new T.SphereGeometry(3.6,24,16),B(0xffb48a));sun.position.set(0,4,-8);g.add(sun);
+  const tk=new T.Mesh(new T.CylinderGeometry(.25,.4,3,10),M(0xa0624a));tk.position.set(0,1.5,-2);g.add(tk);const th=heart(0xff7aa8,4);th.position.set(0,5,-2);g.add(th);
+  const a=person(),b=person(1);a.position.x=-1.1;b.position.x=1.1;a.rotation.y=.4;b.rotation.y=-.4;g.add(a,b);
+  const pt=[...Array(16)].map((_,k)=>sp(g,M(k%2?0xffffff:0xffc0d9),.12,0,0,0,1,.3,1)),hs=hearts(g,3,0xff5c8a,.5),ss=[spark(g,-5,6,0),spark(g,5,6.5,0),spark(g,0,9,-1,1.3)];
+  u.push(t=>{idle(a,t);idle(b,t+1);sc(th,1+Math.sin(t*3)*.07);sun.scale.setScalar(1+Math.sin(t*1.5)*.03);pt.forEach((m,k)=>{const f=(t*.15+k/16)%1;m.position.set(((k*37)%100)/100*10-5+Math.sin(t+k)*.4,8-f*8,((k*13)%7)/7*3-1);m.rotation.set(t+k,t*.7,0)});hs.forEach((h,k)=>{const f=(t*.3+k/3)%1;h.position.set(Math.sin(f*6+k)*.5,2.6+f*3,0);sc(h,1-f*.4)});ss.forEach((s,k)=>twk(s,t,k))})}}
+];
+
+/* ===== YOUR STORY ===== */
+const tex=(txt,w,h,bg,fg,sz=60)=>{const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const x=c.getContext('2d');x.fillStyle=bg;x.beginPath();if(x.roundRect)x.roundRect(0,0,c.width,c.height,c.height/2.2);else x.rect(0,0,c.width,c.height);x.fill();x.fillStyle=fg;const fs=s=>`600 ${s}px Fredoka,Trebuchet MS,sans-serif`;x.font=fs(sz);while(x.measureText(txt).width>c.width*.84&&sz>16){sz-=2;x.font=fs(sz)}x.textAlign='center';x.textBaseline='middle';x.fillText(txt,c.width/2,c.height/2+4);return new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:new T.CanvasTexture(c),transparent:true}))};
+const pop=(m,t,t0)=>{const p=Math.min(Math.max((t-t0)/.6,0),1);m.scale.setScalar(p?eb(p):.001)};
+const banner=(g,txt,y,t0,z=0)=>{const d=tex(txt,4,1,'#ff5c8a','#ffffff',76);d.position.set(0,y,z);d.scale.setScalar(.001);g.add(d);return t=>{d.position.y=y+Math.sin(t*2)*.1;pop(d,t,t0)}};
+const rise=(hs,t,y=2.6,s=.3)=>hs.forEach((h,k)=>{const f=(t*s+k/hs.length)%1;h.position.set(Math.sin(f*6+k)*.8,y+f*3,.5);sc(h,1-f*.5)});
+function baby(){const g=new T.Group(),h=mkHead(0);sp(g,M(0xbfe3ff),.42,0,.38,0,1,.9,1);h.scale.setScalar(.62);h.position.y=1.05;g.add(h);g.userData.eyes=h.userData.eyes;return g}
+function giftBox(){const g=new T.Group(),lid=new T.Group(),pk=0xff5c8a,gd=0xffd95a;
+ const bx=(p,w,h,d,x,y,z,c)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);p.add(m)};
+ bx(g,2.2,1.6,2.2,0,.8,0,pk);bx(g,.4,1.62,2.24,0,.8,0,gd);bx(g,2.24,1.62,.4,0,.8,0,gd);
+ const gl=new T.Mesh(new T.CircleGeometry(.95,24),B(0xfff3b0));gl.rotation.x=-1.5708;gl.position.y=1.62;g.add(gl);
+ bx(lid,2.5,.5,2.5,0,.25,0,0xff7aa8);bx(lid,.45,.52,2.54,0,.25,0,gd);bx(lid,2.54,.52,.45,0,.25,0,gd);
+ sp(lid,M(gd),.3,0,.7,0);sp(lid,M(gd),.4,-.5,.64,0,1.3,.7,.9);sp(lid,M(gd),.4,.5,.64,0,1.3,.7,.9);
+ lid.position.y=1.6;g.add(lid);g.userData.open=q=>{lid.position.set(q*1.4,1.6+q*3.4,0);lid.rotation.set(q*.3,0,-q*.7)};return g}
+const INTRO={title:"",text:"",sky:"#ffd9e6",cam:[0,2.4,10.5,1.6],hideUI:true,
+ build(g,u){const bx=giftBox();bx.scale.setScalar(1.5);g.add(bx);const hs=hearts(g,14,0xff5c8a,.5),ss=[...Array(10)].map(()=>spark(g,0,0,0,1.3));let want=false,t0=-1;
+  INTRO.open=()=>{want=true};INTRO.reset=()=>{want=false;t0=-1;bx.userData.open(0)};
+  u.push(t=>{if(want&&t0<0)t0=t;const tt=t0<0?-1:t-t0;
+   if(tt<0){bx.position.y=Math.abs(Math.sin(t*2))*.3;bx.rotation.set(0,Math.sin(t*1.1)*.25,Math.sin(t*4)*.03)}else{bx.position.y=0;bx.rotation.set(0,0,0);bx.userData.open(eb(Math.min(tt/.9,1)))}
+   hs.forEach((x,k)=>{if(tt<0){sc(x,0);return}const f=Math.min(tt/2.6,1),an=k*.45;x.position.set(Math.cos(an)*f*5,2.6+f*(2+k%4),Math.sin(an*1.7)*f*2);sc(x,Math.max(0,1-f))});
+   ss.forEach((s,k)=>{s.visible=tt>=0&&tt<2.6;const f=Math.max(tt,0)/2.6,an=k*.63;s.position.set(Math.cos(an)*f*4.5,2.6+f*(1.5+k%3),Math.sin(an)*f*2);twk(s,t,k)})})}};
+const FAM={...OLD[5],title:"And now, our little family",text:"Our baby boy Eighros, “Eggy,” is almost 9 months old now, and we’re so excited for everything the future holds for us.",cam:[0,4,13,2.4],
+ build(g,u){const u2=[];OLD[5].build(g,u2);const bb=baby();bb.scale.setScalar(.85);bb.position.set(0,0,1.1);g.add(bb);u2.push(t=>{bb.position.y=Math.sin(t*3)*.05;bb.userData.eyes.scale.y=(t%4)>3.85?.1:1});
+  const box=giftBox();box.scale.setScalar(.001);box.position.set(0,2.8,1);g.add(box);const ban=tex("Happy Birthday, Dhimple!",5,1.1,'#ff5c8a','#ffffff',52);ban.position.set(0,6.7,1);ban.scale.setScalar(.001);g.add(ban);
+  const hs=hearts(g,14,0xff5c8a,.55);hs.forEach(x=>sc(x,0));const sz=new T.Vector3(),tg=new T.Vector3(0,4.6,1);
+  const kids=g.children.filter(c=>c!==box&&c!==ban&&!hs.includes(c)).map(c=>({c,bp:c.position.clone(),bs:c.scale.clone(),br:c.rotation.clone()}));
+  let want=false,t0=-1,done=false;FAM.suck=()=>{want=true};
+  FAM.reset=()=>{want=false;t0=-1;done=false;kids.forEach(k=>{k.c.position.copy(k.bp);k.c.scale.copy(k.bs);k.c.rotation.copy(k.br);k.c.visible=true});box.scale.setScalar(.001);box.userData.open(1);ban.scale.setScalar(.001);hs.forEach(x=>sc(x,0))};
+  u.push((t,dt)=>{if(want&&t0<0){t0=t;kids.forEach(k=>{k.p=k.c.position.clone();k.s=k.c.scale.clone();k.d=.3+Math.min(new T.Box3().setFromObject(k.c).getSize(sz).length(),14)/14*2.2})}
+   if(t0<0){u2.forEach(f=>f(t,dt));return}
+   const ts=t-t0,bp=Math.min(ts/.6,1),bs=1.3*(bp?eb(bp):.001),w=ts<4.2?Math.sin(ts*14)*.03:0;box.scale.setScalar(bs*(1+w));box.position.y=2.8+Math.sin(t*2)*.1;
+   kids.forEach(k=>{const f=Math.max(0,Math.min((ts-k.d)/1.5,1)),e=f*f;if(f>=1){k.c.visible=false;return}if(f===0)return;const o=k.p.clone().sub(tg),an=e*6,cs=Math.cos(an),sn=Math.sin(an);k.c.position.set(tg.x+(o.x*cs-o.z*sn)*(1-e),tg.y+o.y*(1-e),tg.z+(o.x*sn+o.z*cs)*(1-e));k.c.scale.copy(k.s).multiplyScalar(1-e)});
+   const cp=Math.min(Math.max((ts-4.2)/.7,0),1);box.userData.open(1-cp*cp*(3-2*cp));
+   if(ts>4.9){const q=ts-4.9,z=Math.sin(q*18)*.08*Math.exp(-q*3);box.scale.set(bs*(1+z),bs*(1-z),bs*(1+z));
+    hs.forEach((x,k)=>{const f=Math.min(q/2.5,1),an=k*.45;x.position.set(Math.cos(an)*f*5,2.8+f*2+Math.sin(k)*f*2,1+Math.sin(an)*f*2);sc(x,Math.max(0,1-f*f))})}
+   ban.position.y=6.7+Math.sin(t*2)*.1;pop(ban,ts,5.2);if(!done&&ts>5.6){done=true;$("ui").style.display=""}})}};
+const STORY=[
+INTRO,
+{...OLD[0],title:"A back subject at PUP",text:"I met Dhimple in a back subject at PUP Sta. Mesa, where she was one of my classmates."},
+{title:"Dance Central after class",text:"We were a circle of friends, four boys and two girls, all classmates, who’d go to a console rental after class to play Dance Central. I was close to her, but I thought of her as nothing more than a friend.",sky:"#d9e0ff",cam:[0,3.6,13,1],
+ build(g,u){island(g,0xcfd6ff);const tb=new T.Mesh(new T.BoxGeometry(4.4,1.5,1),M(0x8a7bd6));tb.position.set(0,.75,-3);g.add(tb);
+  const tv=new T.Mesh(new T.BoxGeometry(3.8,2.4,.3),M(0x2a2a3a));tv.position.set(0,2.7,-3);g.add(tv);const scr=new T.Mesh(new T.PlaneGeometry(3.4,2),B(0x6bd6ff));scr.position.set(0,2.7,-2.84);g.add(scr);
+  const ps=[[-4.5,0xffb86b,0],[-2.7,0xc7a0ff,1],[-.9,0x7aa7ff,0],[.9,0xff8fb1,1],[2.7,0x9be7a0,0],[4.5,0xffd95a,0]].map(([x,c,h])=>{const p=person(h,c);p.position.set(x,0,.5);g.add(p);return p});
+  const hh=heart(0xff5c8a,.5);hh.position.set(.9,4.6,0);g.add(hh);
+  u.push(t=>{scr.material.color.setHSL((t*.15)%1,.6,.7);ps.forEach((p,k)=>{idle(p,t+k);const q=p.userData,w=t*5+k*1.3;q.aR.rotation.z=1.6+Math.sin(w)*.9;q.aL.rotation.z=-1.6-Math.sin(w+1.6)*.9;q.b.rotation.z=Math.sin(w)*.12;q.b.position.y=Math.abs(Math.sin(w))*.25});sc(hh,1+Math.sin(t*4)*.15)})}},
+{title:"“Boyfriend mo ’to”",text:"The very first text I sent her, when she asked who I was: “Boyfriend mo ’to” (I’m your boyfriend). I never knew it would one day come true.",sky:"#ffe0ec",cam:[0,3.4,10,2.2],
+ build(g,u){island(g,0xffd0e1);const ph=new T.Mesh(new T.BoxGeometry(3.2,5,.3),M(0x3a2840));ph.position.set(0,3.3,0);g.add(ph);const scr=new T.Mesh(new T.PlaneGeometry(2.9,4.6),B(0xfff4f8));scr.position.set(0,3.3,.16);g.add(scr);
+  const b1=tex("Sino ’to?",1.7,.8,'#e8dfe6','#4a2338',54),b2=tex("Boyfriend mo ’to",2.4,.8,'#ff5c8a','#ffffff',48);b1.position.set(.55,4.5,.2);b2.position.set(-.2,3.4,.2);g.add(b1,b2);
+  const a=person(),b=person(1);a.position.set(-4.2,0,0);b.position.set(4.2,0,0);a.rotation.y=.6;b.rotation.y=-.6;g.add(a,b);const hs=hearts(g,4,0xff5c8a,.4);
+  u.push(t=>{idle(a,t,1);idle(b,t+1);pop(b1,t,.5);pop(b2,t,2);hs.forEach((h,k)=>{if(t<2.4){sc(h,0);return}const f=(t*.3+k/4)%1;h.position.set(Math.sin(f*6+k)*1.8,3+f*3,.4);sc(h,1-f*.5)})})}},
+{title:"She said yes",text:"I courted her for some time, and on the 29th of May 2014, on a blue air-conditioned bus, she said “yes” to being my girlfriend.",sky:"#d6ecff",cam:[0,4,12.5,2.2],
+ build(g,u){const gr=new T.Mesh(new T.BoxGeometry(60,.6,18),M(0xd9e4f2));gr.position.y=-.3;g.add(gr);const rd=new T.Mesh(new T.BoxGeometry(60,.1,4.4),M(0x7d6b7d));rd.position.set(0,.03,.6);g.add(rd);
+  const bus=new T.Group();g.add(bus);const bx=(w,h,d,x,y,z,c)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);bus.add(m)};
+  bx(8.4,.25,2.8,0,.75,0,0x4a8fe0);bx(8.4,.25,2.8,0,3.85,0,0x6ab0ff);bx(8.4,3,.15,0,2.3,-1.35,0xdff0ff);bx(.18,3,2.8,4.2,2.3,0,0x6ab0ff);bx(.18,3,2.8,-4.2,2.3,0,0x6ab0ff);bx(8.4,.5,.12,0,1.2,1.4,0x9ccbff);
+  [-3.6,-1.8,0,1.8,3.6].forEach(x=>bx(.18,3,.18,x,2.3,1.4,0x6ab0ff));[-2,2].forEach(x=>bx(2.2,1.6,.4,x,1.7,-.95,0x3a78c8));bx(1.8,.12,.5,0,3.7,-.4,0xffffff);
+  const rl=new T.Mesh(new T.CylinderGeometry(.05,.05,7.6,6),M(0xdddddd));rl.rotation.z=1.5708;rl.position.set(0,3.4,.2);bus.add(rl);
+  const lp=[-2.5,2.5].map(x=>{const o=new T.Mesh(new T.TorusGeometry(.18,.03,6,12),M(0xffffff));o.position.set(x,3,.2);bus.add(o);return o});
+  const ws=[-2.6,2.6].map(x=>{const w=new T.Group();w.position.set(x,.6,1.5);const c=new T.Mesh(new T.CylinderGeometry(.62,.62,.35,18),M(0x2b2b3a));c.rotation.x=1.5708;w.add(c,new T.Mesh(new T.BoxGeometry(.6,.1,.4),M(0xffffff)));bus.add(w);return w});
+  const a=person(),b=person(1);a.scale.setScalar(.85);b.scale.setScalar(.85);a.position.set(-.6,.88,.2);b.position.set(.6,.88,.2);a.rotation.y=.3;b.rotation.y=-.3;bus.add(a,b);
+  const sn=[...Array(10)].map(()=>{const m=new T.Mesh(new T.OctahedronGeometry(.1),B(0xe8f6ff));bus.add(m);return m});
+  const tr=[...Array(9)].map((_,k)=>{const o=new T.Group(),c=new T.Mesh(new T.ConeGeometry(.9,2.2,10),M(k%3?0x7ccf9a:0xffa8c4));c.position.y=2;const tk=new T.Mesh(new T.CylinderGeometry(.14,.14,.9,6),M(0xa0624a));tk.position.y=.45;o.add(c,tk);o.position.z=-5-(k%2)*1.8;g.add(o);return o});
+  const hh=heart(0xff5c8a,1.3);hh.position.set(0,5.2,0);g.add(hh);const hs=hearts(g,4,0xff8fb1,.4),bn=banner(g,"29 • 05 • 2014",6.8,3);
+  u.push((t,dt)=>{bus.position.y=Math.sin(t*9)*.025;ws.forEach(w=>w.rotation.z-=dt*8);idle(a,t);idle(b,t+1);a.userData.aR.rotation.z=.5;b.userData.aL.rotation.z=-.5;
+   tr.forEach((o,k)=>o.position.x=(((k*6-t*5)%54)+54)%54-27);lp.forEach((l,k)=>l.rotation.z=Math.sin(t*3+k)*.2);
+   sn.forEach((m,k)=>{const f=(t*.4+k/10)%1;m.position.set(-1+((k*37)%100)/100*2+Math.sin(t*2+k)*.2,3.6-f*2.4,.2+Math.sin(k)*.3);m.rotation.y=t*2+k;m.scale.setScalar(1-f*.6)});
+   const q=Math.max(0,Math.min((t-2.6)/.6,1));sc(hh,q?eb(q):0);hh.rotation.y=Math.sin(t*2)*.4;
+   hs.forEach((x,k)=>{if(t<2.6){sc(x,0);return}const f=(t*.35+k/4)%1;x.position.set(Math.sin(f*6+k)*1.5,3.8+f*1.6,.5);sc(x,1-f*.6)});bn(t)})}},
+{title:"Days turned to years",text:"Days turned to months, and months turned to years. With no car in the COVID days, we walked mall after mall, hand in hand, spending time and eating together.",sky:"#fff0e6",cam:[0,3.6,11.5,1.8],
+ build(g,u){const fl=new T.Mesh(new T.BoxGeometry(60,.6,14),M(0xffe9e0));fl.position.y=-.3;g.add(fl);const wl=new T.Mesh(new T.BoxGeometry(60,9,.3),M(0xfff6f0));wl.position.set(0,4.5,-6);g.add(wl);
+  const sh=[0xff8fb1,0x9be7ff,0xffd95a,0xb5e8c3,0xc7a0ff,0xffb86b,0x7aa7ff,0xff9aa2].map(c=>{const o=new T.Group(),b1=new T.Mesh(new T.BoxGeometry(5,3.4,.5),M(0xffffff));b1.position.y=1.9;const aw=new T.Mesh(new T.BoxGeometry(5.2,.5,1.3),M(c));aw.position.set(0,3.9,.5);const sg=new T.Mesh(new T.BoxGeometry(2.4,.6,.1),B(c));sg.position.set(0,2.3,.3);o.add(b1,aw,sg);o.position.z=-5.5;g.add(o);return o});
+  const mk=p=>{const m=new T.Mesh(new T.SphereGeometry(.34,14,10),M(0xcfe9ff));m.position.set(0,-.17,.42);m.scale.set(1.05,.62,.55);p.userData.b.children[1].add(m)};
+  const ic=()=>{const o=new T.Group(),c=new T.Mesh(new T.ConeGeometry(.12,.4,8),M(0xe8b66a));c.rotation.x=3.1416;o.add(c);sp(o,M(0xffc0d9),.17,0,.28,0);o.position.y=-.6;return o};
+  const a=person(),b=person(1);a.position.x=-.75;b.position.x=.75;g.add(a,b);mk(a);mk(b);const ia=ic(),ib=ic();a.userData.aL.add(ia);b.userData.aR.add(ib);
+  const hs=hearts(g,3,0xff8fb1,.4),bn=banner(g,"Days • Months • Years",6.2,.6);
+  u.push(t=>{idle(a,t);idle(b,t+1);[a,b].forEach((p,k)=>{p.userData.b.position.y=Math.abs(Math.sin(t*5+k*.4))*.12});
+   a.userData.aR.rotation.z=.5;b.userData.aL.rotation.z=-.5;a.userData.aL.rotation.z=-.7+Math.sin(t*5)*.05;b.userData.aR.rotation.z=.7-Math.sin(t*5)*.05;ia.rotation.z=-a.userData.aL.rotation.z;ib.rotation.z=-b.userData.aR.rotation.z;
+   sh.forEach((o,k)=>o.position.x=(((k*6.6-t*2.2)%52.8)+52.8)%52.8-26.4);rise(hs,t,2.8,.2);bn(t)})}},
+{title:"The big question",text:"On the 29th of May 2024, while we were out of town at the Sky Eye at Sky Ranch in Tagaytay, I proposed.",sky:"#ffe3f0",cam:[0,4,13,3.4],
+ build(g,u){OLD[4].build(g,u);const w=new T.Group(),R2=4;w.position.set(0,5.6,-6);g.add(w);w.add(new T.Mesh(new T.TorusGeometry(R2,.12,8,48),M(0xffffff)));
+  for(let k=0;k<10;k++){const an=k*.628,c=new T.Mesh(new T.SphereGeometry(.4,12,8),M(k%2?0xff8fb1:0x9be7ff));c.position.set(Math.cos(an)*R2,Math.sin(an)*R2,0);w.add(c);const s=new T.Mesh(new T.BoxGeometry(.06,R2,.06),M(0xffffff));s.position.set(Math.cos(an)*R2/2,Math.sin(an)*R2/2,0);s.rotation.z=an-1.5708;w.add(s)}
+  const lg=new T.Mesh(new T.BoxGeometry(.3,5.8,.3),M(0xffffff));lg.position.set(0,2.7,-6);g.add(lg);const bn=banner(g,"29 • 05 • 2024",1.1,2.5,3.6);u.push(t=>{w.rotation.z=-t*.25;bn(t)})}},
+{title:"We said “I do”",text:"The next year, on the 5th of April 2025, we got married: Dhimple in a white dress, me in a white coat and black pants.",sky:"#fff3e0",cam:[0,3.8,11.5,2.6],
+ build(g,u){island(g,0xffe9f1);const ar=new T.Group();ar.position.z=-1.8;g.add(ar);
+  [-2.4,2.4].forEach(x=>{const c=new T.Mesh(new T.CylinderGeometry(.16,.16,3,10),M(0xffffff));c.position.set(x,1.5,0);ar.add(c);sp(ar,M(0xff8fb1),.35,x,.35,0);sp(ar,M(0xffd0e1),.3,x*.9,.9,.1)});
+  const tp=new T.Mesh(new T.TorusGeometry(2.4,.16,10,32,3.1416),M(0xffffff));tp.position.y=3;ar.add(tp);
+  for(let k=0;k<15;k++){const an=k/14*3.1416;sp(ar,M(k%2?0xff8fb1:0xffd0e1),.3,Math.cos(an)*2.4,3+Math.sin(an)*2.4,0)}
+  const a=person(0,0xffffff),b=person(1,0xffffff);[-.2,.2].forEach(x=>{const l=new T.Mesh(new T.CylinderGeometry(.2,.2,.75,10),M(0x22222e));l.position.set(x,.38,0);a.userData.b.add(l)});sp(a.userData.b,M(0x22222e),.1,0,1.42,.5,1.6,.8,.5);a.position.x=-1;b.position.x=1;a.rotation.y=.35;b.rotation.y=-.35;g.add(a,b);
+  const dr=new T.Mesh(new T.ConeGeometry(.95,1.2,16),M(0xffffff));dr.position.y=.6;b.userData.b.add(dr);
+  const cf=[...Array(28)].map((_,k)=>{const m=new T.Mesh(new T.BoxGeometry(.14,.02,.14),B(new T.Color().setHSL(k/28,.8,.7)));g.add(m);return m}),hs=hearts(g,3),bn=banner(g,"05 • 04 • 2025",6.9,.8);
+  u.push(t=>{idle(a,t);idle(b,t+1);cf.forEach((m,k)=>{const f=(t*.2+k/28)%1;m.position.set(((k*37)%100)/100*12-6,9-f*9,((k*13)%7)/7*4-2);m.rotation.set(t*2+k,t+k,0)});rise(hs,t);bn(t)})}},
+{title:"Our honeymoon in Taiwan",text:"Five days, four nights! Maokong Gondola, Ximending Night Market, Chiang Kai-shek Memorial Hall, Taipei 101, Jiufen Old Street, Shifen Waterfall and Yehliu Geopark.",sky:"#ffd9c9",cam:[0,3.8,12,2.3],
+ build(g,u){island(g,0xffd5c0);const tw=new T.Group();tw.position.set(-4.6,0,-2);tw.scale.setScalar(.62);g.add(tw);
+  const bm=new T.Mesh(new T.BoxGeometry(2.4,1.2,2.4),M(0x5bbfa0));bm.position.y=.6;tw.add(bm);
+  for(let k=0;k<8;k++){const s=new T.Mesh(new T.CylinderGeometry(.75,.95,1,4),M(k%2?0x7ccf9a:0x5bbfa0));s.rotation.y=.785;s.position.y=1.7+k;tw.add(s)}
+  const spi=new T.Mesh(new T.CylinderGeometry(.05,.3,2.4,8),M(0xffffff));spi.position.y=10.4;tw.add(spi);
+  const A=new T.Vector3(.5,5.6,-1.5),E=new T.Vector3(6.6,1.9,-1.5),dx=E.x-A.x,dy=E.y-A.y,cb=new T.Mesh(new T.CylinderGeometry(.04,.04,Math.hypot(dx,dy),6),M(0x6a5060));
+  cb.position.set((A.x+E.x)/2,(A.y+E.y)/2,-1.5);cb.rotation.z=Math.atan2(dy,dx)-1.5708;g.add(cb);const pl=new T.Mesh(new T.CylinderGeometry(.12,.12,2.4,6),M(0x6a5060));pl.position.set(E.x+.3,1.2,-1.5);g.add(pl);
+  const gd=new T.Group(),gb=new T.Mesh(new T.BoxGeometry(.9,.7,.8),M(0xff5c8a));gb.position.y=-.9;gd.add(gb);g.add(gd);
+  const ln=[...Array(10)].map((_,k)=>sp(g,B(k%2?0xffb347:0xff7a59),.28,0,0,0,1,1.3,1));
+  const a=person(),b=person(1);a.position.set(-.4,0,2);b.position.set(1.6,0,2);g.add(a,b);
+  [[-1.5,0x7aa7ff],[2.8,0xff8fb1]].forEach(([x,c])=>{const s=new T.Mesh(new T.BoxGeometry(.7,1,.4),M(c));s.position.set(x,.5,2);g.add(s)});
+  u.push(t=>{idle(a,t,1);idle(b,t+1,2);const f=(Math.sin(t*.5)+1)/2;gd.position.set(A.x+dx*f,A.y+dy*f,-1.5);gd.rotation.z=Math.sin(t*2)*.05;
+   ln.forEach((m,k)=>{const q=(t*.07+k/10)%1;m.position.set(-6+((k*53)%100)/100*12+Math.sin(t+k)*.3,1+q*9,-3+((k*29)%5)/5*4);m.scale.setScalar(1-Math.max(0,q-.8)*4)})})}},
+{title:"Meet Eighros “Eggy”",text:"A week after our honeymoon, Dhimple got pregnant, and on the 7th of February 2026, our baby boy Eighros, “Eggy,” was born.",sky:"#d6ecff",cam:[0,3.6,11,2.2],
+ build(g,u){island(g,0xcfe6ff);const a=person(),b=person(1);a.position.x=-2.4;b.position.x=2.4;a.rotation.y=.45;b.rotation.y=-.45;g.add(a,b);
+  sp(g,B(0xffffff),1.2,0,.25,.4,1,.3,1);const bb=baby();bb.position.set(0,.45,.4);g.add(bb);
+  const st=[...Array(5)].map(()=>spark(g,0,0,0,1.1)),hs=hearts(g,3,0xff8fb1,.45),bl=[[-5,0xff8fb1],[5,0x9be7ff],[-4,0xffd95a]].map(([x,c])=>{const m=sp(g,M(c),.5,x,4,-1,1,1.2,1);const l=new T.Mesh(new T.CylinderGeometry(.02,.02,2.5,4),M(0xffffff));l.position.set(x,2.6,-1);g.add(l);return m}),bn=banner(g,"07 • 02 • 2026",7,.6),nm=tex("Eighros “Eggy”",3.6,.85,"#9be7ff","#2a4a6a",50);nm.position.set(0,.6,2.6);nm.scale.setScalar(.001);g.add(nm);
+  u.push(t=>{idle(a,t,1);idle(b,t+1,2);bb.userData.eyes.scale.y=(t%4)>3.85?.1:1;bb.position.y=.45+Math.sin(t*2)*.04;
+   st.forEach((s,k)=>{const an=t*.9+k*1.256;s.position.set(Math.cos(an)*1.8,2.9+Math.sin(an*2)*.3,.4+Math.sin(an)*1.8);twk(s,t,k)});rise(hs,t,2.4);bl.forEach((m,k)=>m.position.y=4+Math.sin(t*1.2+k)*.3);bn(t);pop(nm,t,1.5)})}},
+FAM,
+{share:10,title:"I love you, Dhimple",text:"Happy birthday! ♥",sky:"#ffc9dc",cam:[0,4,13,2.4],hideUI:true,onShow(){FAM.suck&&FAM.suck()}}
+];
+
+/* ===== engine ===== */
+const GAP=34,ups=[],lt=STORY.map(()=>0);
+let cur=0;
+const cam=new T.PerspectiveCamera(50,1,.1,200),S3=new T.Scene(),camP=new T.Vector3(),camL=new T.Vector3(),tp=new T.Vector3(),tl=new T.Vector3(),bg=new T.Color();
+let mx=0,my=0,smx=0,smy=0;
+const skyC=i=>new T.Color(STORY[i].sky).multiplyScalar(dark?.3:1);
+function aim(){const c=STORY[cur].cam,f=Math.max(1,.9/cam.aspect),X=(STORY[cur].share??cur)*GAP;tp.set(X+c[0]*f,c[1]+(f-1)*1.2,c[2]*f);tl.set(X,c[3]-(cam.aspect<1?1.3:0),0)}
+if(R){
+ R.setPixelRatio(Math.min(devicePixelRatio,2));R.domElement.id="gl";document.body.prepend(R.domElement);
+ S3.add(new T.AmbientLight(0xffffff,dark?.6:.85));const dl=new T.DirectionalLight(0xffffff,dark?.5:.75);dl.position.set(5,10,8);S3.add(dl);
+ S3.background=new T.Color();S3.fog=new T.Fog(0xffffff,22,55);
+ STORY.forEach((s,i)=>{if(s.share!=null){ups.push([]);return}const g=new T.Group(),u=[];g.position.x=i*GAP;S3.add(g);s.build(g,u);ups.push(u)});
+ const resize=()=>{R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();aim()};
+ addEventListener("resize",resize);resize();camP.copy(tp);camL.copy(tl);bg.copy(skyC(0));
+ addEventListener("pointermove",e=>{mx=e.clientX/innerWidth*2-1;my=e.clientY/innerHeight*2-1});
+ let last=performance.now();
+ const loop=now=>{requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;
+  const k=1-Math.exp(-dt*2.4),d=camP.distanceTo(tp);camP.lerp(tp,k);camL.lerp(tl,k);smx+=(mx-smx)*.05;smy+=(my-smy)*.05;
+  cam.position.set(camP.x+smx*1.6,camP.y+Math.min(d*.13,5)-smy*.8,camP.z);cam.lookAt(camL.x+smx*.5,camL.y,camL.z);
+  bg.lerp(skyC(cur),k);S3.background.copy(bg);S3.fog.color.copy(bg);
+  ups.forEach((u,i)=>{lt[i]+=dt;u.forEach(f=>f(lt[i],dt))});R.render(S3,cam)};
+ requestAnimationFrame(loop);
+}
+$("dots").innerHTML=STORY.map(()=>"<i></i>").join("");
+function show(n){
+  cur=Math.max(0,Math.min(STORY.length-1,n));const s=STORY[cur];if(cur===0)STORY.forEach(x=>x.reset&&x.reset());lt[cur]=0;if(R)aim();$("ui").style.display=(s.hideUI&&R)?"none":"";if(s.onShow)s.onShow();
+  const cd=$("card");cd.style.animation="none";cd.offsetWidth;cd.style.animation="";
+  $("t").textContent=s.title;$("p").textContent=s.text+(R?"":" (The 3D view couldn’t start on this device, so this is the text-only version.)");
+  [...$("dots").children].forEach((d,k)=>d.classList.toggle("on",k===cur));
+  $("back").hidden=cur<=1||cur===STORY.length-1;$("next").textContent=cur===STORY.length-1?"Start over ♥":"Next ♥";
+}
+function burst(x,y){for(let k=0;k<7;k++){const h=document.createElement("span");h.className="burst";h.textContent=["💗","💖","✨","💕"][k%4];
+  h.style.left=x+"px";h.style.top=y+"px";h.style.setProperty("--x",(Math.random()*160-80)+"px");h.style.setProperty("--y",(-40-Math.random()*110)+"px");
+  document.body.appendChild(h);setTimeout(()=>h.remove(),950)}}
+const go=d=>{if(cur===0){if(R&&!go.o){go.o=1;INTRO.open();setTimeout(()=>{go.o=0;show(1)},1700)}return}if($("ui").style.display==="none")return;if(d<0){if(cur>1&&cur<STORY.length-1)show(cur-1)}else show(cur===STORY.length-1?0:cur+1)};
+document.addEventListener("click",e=>{burst(e.clientX||innerWidth/2,e.clientY||innerHeight/2);go(e.target.closest("#back")?-1:1)});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight")go(1);if(e.key==="ArrowLeft")go(-1)});
+show(R?0:1);
+</script>
+</body>
+</html>
